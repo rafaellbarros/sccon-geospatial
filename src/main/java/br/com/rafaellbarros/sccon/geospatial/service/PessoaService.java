@@ -79,6 +79,12 @@ public class PessoaService {
         return pessoaSalva;
     }
 
+    public void removerPessoa(Long id) {
+        repository.removerPorId(id);
+
+        log.info("Pessoa removida com sucesso. id={}", id);
+    }
+
     private void validarCamposObrigatorios(Pessoa pessoa) {
         validarTextoObrigatorio(
                 pessoa.getNome(),

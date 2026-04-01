@@ -2,18 +2,23 @@
 
 ## 📋 Sobre o Projeto
 
-API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, utilizando armazenamento em memória (Map) para alta performance nas operações de busca por ID.
+API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, utilizando armazenamento em memória (`ConcurrentHashMap`) para alta performance nas operações de busca por ID.
 
 ### 🚀 Funcionalidades Implementadas
 
-- ✅ **Modelo de Pessoa**: Entidade com atributos (id, nome, dataNascimento, dataAdmissão)
-- ✅ **Armazenamento em Memória**: Mapa ConcurrentHashMap otimizado para busca por ID (O(1))
+- ✅ **Modelo de Pessoa**: Entidade com atributos (`id`, `nome`, `dataNascimento`, `dataAdmissao`)
+- ✅ **Armazenamento em Memória**: Mapa `ConcurrentHashMap` otimizado para busca por ID (O(1))
 - ✅ **Inicialização Automática**: População inicial com 3 pessoas no momento da inicialização
 - ✅ **Endpoint GET /person**: Retorna lista ordenada alfabeticamente por nome
 - ✅ **Endpoint POST /person**: Inclui nova pessoa no mapa com regras de negócio específicas
-    - ID não especificado → atribui automaticamente o maior ID + 1
-    - ID especificado e já existente → retorna HTTP 409 (Conflict)
-    - Validação de campos obrigatórios
+  - ID não especificado → atribui automaticamente o maior ID + 1
+  - ID especificado e já existente → retorna HTTP 409 (Conflict)
+  - Validação de campos obrigatórios → HTTP 400 (Bad Request)
+- ✅ **Endpoint DELETE /person/{id}**
+  - Remove uma pessoa do mapa em memória
+  - Caso o ID não exista → retorna HTTP 404 (Not Found)
+
+---
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -22,15 +27,19 @@ API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, util
 - Spring Web
 - Maven
 
+---
+
 ## 🔧 Pré-requisitos
 
 - JDK 17 ou superior
 - Maven 3.6+
 - Git (opcional)
 
+---
+
 ## 🚀 Como Executar a Aplicação
 
-### 1. Clone o repositório (ou baixe os arquivos)
+### 1. Clone o repositório
 
 ```bash
 git clone https://github.com/rafaellbarros/sccon-geospatial.git
@@ -43,9 +52,6 @@ cd sccon-geospatial
 
 ```bash
 mvn clean install
-```
-
-```bash
 mvn spring-boot:run
 ```
 
@@ -53,31 +59,44 @@ mvn spring-boot:run
 
 ```bash
 mvn clean package
-```
-
-```bash
-
 java -jar target/sccon-geospatial-0.0.1-SNAPSHOT.jar
 ```
 
-### 3. Endpoints Disponíveis
+---
 
-#### Base URL
+## 🌐 Endpoints Disponíveis
+
+### Base URL
 
 ```bash
 http://localhost:8080/person
 ```
 
-#### 1. Listar todas as pessoas (ordenadas por nome - A-Z)
+---
+
+## 1. Listar todas as pessoas (ordenadas por nome - A-Z)
+
 ```bash
 GET /person
 ```
-#### 2. Criar pessoas
+
+Exemplo:
+
+```bash
+curl -X GET http://localhost:8080/person
+```
+
+---
+
+## 2. Criar pessoa
+
 ```bash
 POST /person
 ```
 
-#### 2.1 Criar pessoa sem ID (ID automático)
+---
+
+### 2.1 Criar pessoa sem ID (ID automático)
 
 Quando o campo `id` não é informado, a API atribui automaticamente o próximo ID disponível.
 
@@ -91,7 +110,7 @@ curl -X POST http://localhost:8080/person \
   }'
 ```
 
-#### Resposta esperada — HTTP 201 (Created)
+### Resposta esperada — HTTP 201 (Created)
 
 ```json
 {
@@ -104,9 +123,7 @@ curl -X POST http://localhost:8080/person \
 
 ---
 
-#### 2.2 Criar pessoa com ID informado e disponível
-
-Quando o `id` é informado e ainda não existe no mapa, a pessoa é criada com sucesso.
+### 2.2 Criar pessoa com ID informado e disponível
 
 ```bash
 curl -X POST http://localhost:8080/person \
@@ -119,7 +136,7 @@ curl -X POST http://localhost:8080/person \
   }'
 ```
 
-#### Resposta esperada — HTTP 201 (Created)
+### Resposta esperada — HTTP 201 (Created)
 
 ```json
 {
@@ -132,9 +149,7 @@ curl -X POST http://localhost:8080/person \
 
 ---
 
-#### 2.3 Tentar criar pessoa com ID já existente (Conflito)
-
-Quando o `id` já existir, a API retorna erro `409 Conflict`.
+### 2.3 Tentar criar pessoa com ID já existente (Conflito)
 
 ```bash
 curl -X POST http://localhost:8080/person \
@@ -147,7 +162,7 @@ curl -X POST http://localhost:8080/person \
   }'
 ```
 
-#### Resposta esperada — HTTP 409 (Conflict)
+### Resposta esperada — HTTP 409 (Conflict)
 
 ```json
 {
@@ -160,9 +175,7 @@ curl -X POST http://localhost:8080/person \
 
 ---
 
-#### 2.4 Tentar criar pessoa com campos obrigatórios ausentes
-
-Quando algum campo obrigatório não for informado, a API retorna erro `400 Bad Request`.
+### 2.4 Campos obrigatórios ausentes
 
 ```bash
 curl -X POST http://localhost:8080/person \
@@ -174,7 +187,7 @@ curl -X POST http://localhost:8080/person \
   }'
 ```
 
-#### Resposta esperada — HTTP 400 (Bad Request)
+### Resposta esperada — HTTP 400 (Bad Request)
 
 ```json
 {
@@ -185,63 +198,59 @@ curl -X POST http://localhost:8080/person \
 }
 ```
 
-> Obs.: A mensagem pode variar conforme o campo inválido.
-
 ---
 
-#### 2.5 Verificar lista ordenada após inserções
-
-A listagem retorna as pessoas ordenadas alfabeticamente por nome.
+## 3. Remover pessoa por ID
 
 ```bash
-curl -X GET http://localhost:8080/person
-```
-
-#### Resposta esperada — HTTP 200 (OK)
-
-```json
-[
-  {
-    "id": 3,
-    "nome": "Carlos Santos",
-    "dataNascimento": "1995-12-03",
-    "dataAdmissao": "2018-01-15"
-  },
-  {
-    "id": 10,
-    "nome": "Fernanda Souza",
-    "dataNascimento": "1991-07-30",
-    "dataAdmissao": "2017-11-15"
-  },
-  {
-    "id": 1,
-    "nome": "João Silva",
-    "dataNascimento": "1990-05-15",
-    "dataAdmissao": "2015-03-10"
-  },
-  {
-    "id": 4,
-    "nome": "Mariana Costa",
-    "dataNascimento": "1993-09-18",
-    "dataAdmissao": "2019-04-22"
-  },
-  {
-    "id": 2,
-    "nome": "Maria Oliveira",
-    "dataNascimento": "1985-08-22",
-    "dataAdmissao": "2010-07-01"
-  }
-]
+DELETE /person/{id}
 ```
 
 ---
 
-📄 Licença
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+### 3.1 Remover pessoa existente
 
-📞 Contato
-Desenvolvedor: Rafael Barros
+```bash
+curl -X DELETE http://localhost:8080/person/1
+```
 
-Email: rafaelbarros.df@gmail.com
+### Resposta esperada — HTTP 204 (No Content)
 
-Projeto: [sccon-geospatial](https://github.com/rafaellbarros/sccon-geospatial)
+```http
+204 No Content
+```
+
+---
+
+### 3.2 Tentar remover pessoa inexistente
+
+```bash
+curl -X DELETE http://localhost:8080/person/999
+```
+
+### Resposta esperada — HTTP 404 (Not Found)
+
+```json
+{
+  "timestamp": "2026-04-01T19:40:00",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Pessoa com ID 999 não encontrada"
+}
+```
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT.
+
+Veja o arquivo `LICENSE` para mais detalhes.
+
+---
+
+## 📞 Contato
+
+**Desenvolvedor:** Rafael Barros  
+**Email:** rafaelbarros.df@gmail.com  
+**Projeto:** [sccon-geospatial](https://github.com/rafaellbarros/sccon-geospatial)

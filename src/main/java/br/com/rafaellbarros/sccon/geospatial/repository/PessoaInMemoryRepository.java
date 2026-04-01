@@ -2,6 +2,7 @@ package br.com.rafaellbarros.sccon.geospatial.repository;
 
 import br.com.rafaellbarros.sccon.geospatial.domain.model.Pessoa;
 import br.com.rafaellbarros.sccon.geospatial.exception.PessoaDuplicadaException;
+import br.com.rafaellbarros.sccon.geospatial.exception.PessoaNaoEncontradaException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,5 +34,18 @@ public class PessoaInMemoryRepository {
 
         pessoa.setId(id);
         return pessoa;
+    }
+
+    public void removerPorId(Long id) {
+        Pessoa pessoaRemovida = pessoaMap.remove(id);
+
+        if (pessoaRemovida == null) {
+            throw new PessoaNaoEncontradaException(
+                    String.format(
+                            "Pessoa com ID %d não encontrada",
+                            id
+                    )
+            );
+        }
     }
 }

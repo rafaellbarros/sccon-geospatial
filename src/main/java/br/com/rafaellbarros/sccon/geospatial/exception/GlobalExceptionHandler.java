@@ -14,6 +14,18 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(PessoaNaoEncontradaException.class)
+    public ResponseEntity<ErrorResponse> handlePessoaNaoEncontradaException(
+            PessoaNaoEncontradaException ex
+    ) {
+        log.warn("Registro não encontrado: {}", ex.getMessage(), ex);
+
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
+    }
+
     @ExceptionHandler(PessoaDuplicadaException.class)
     public ResponseEntity<ErrorResponse> handlePessoaDuplicadaException(
             PessoaDuplicadaException ex

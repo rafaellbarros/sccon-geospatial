@@ -34,4 +34,13 @@ public class PessoaController {
                 .body(novaPessoa);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removerPessoa(
+            @PathVariable Long id
+    ) {
+        pessoaService.removerPessoa(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
