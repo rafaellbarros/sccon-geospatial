@@ -10,7 +10,10 @@ API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, util
 - ✅ **Armazenamento em Memória**: Mapa ConcurrentHashMap otimizado para busca por ID (O(1))
 - ✅ **Inicialização Automática**: População inicial com 3 pessoas no momento da inicialização
 - ✅ **Endpoint GET /person**: Retorna lista ordenada alfabeticamente por nome
-
+- ✅ **Endpoint POST /person**: Inclui nova pessoa no mapa com regras de negócio específicas
+    - ID não especificado → atribui automaticamente o maior ID + 1
+    - ID especificado e já existente → retorna HTTP 409 (Conflict)
+    - Validação de campos obrigatórios
 
 ## 🛠️ Tecnologias Utilizadas
 

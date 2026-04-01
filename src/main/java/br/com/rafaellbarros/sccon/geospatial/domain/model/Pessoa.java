@@ -17,7 +17,7 @@ public class Pessoa {
     @JsonProperty("data_nascimento")
     private LocalDate dataNascimento;
 
-    @JsonProperty("data_admissão")
+    @JsonProperty("data_admissao")
     private LocalDate dataAdmissao;
 
     public Pessoa() {
