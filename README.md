@@ -28,6 +28,10 @@ API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, util
 - ✅ **Endpoint GET /person/{id}**
   - Busca uma pessoa específica por ID
   - Caso o ID não exista → HTTP 404 (Not Found)
+- ✅ **Endpoint GET /person/{id}/age?output={days|months|years}**
+  - Retorna a idade atual da pessoa em dias, meses ou anos completos
+  - Caso o ID não exista → HTTP 404 (Not Found)
+  - Caso o parâmetro `output` seja inválido → HTTP 400 (Bad Request)
 
 ---
 
@@ -511,6 +515,105 @@ curl -X GET http://localhost:8080/person/999
   "status": 404,
   "error": "Not Found",
   "message": "Pessoa com ID 999 não encontrada"
+}
+```
+---
+
+## 7. Consultar idade atual da pessoa
+
+```bash
+GET /person/{id}/age?output={days|months|years}
+```
+
+Retorna a idade atual da pessoa em **dias**, **meses** ou **anos completos**, de acordo com o parâmetro `output`.
+
+Valores aceitos para `output`:
+
+- `days`
+- `months`
+- `years`
+
+Caso o ID não exista, a API retorna **HTTP 404 (Not Found)**.
+
+Caso o parâmetro `output` seja inválido, a API retorna **HTTP 400 (Bad Request)**.
+
+---
+
+### 7.1 Consultar idade em dias
+
+```bash
+curl -X GET "http://localhost:8080/person/1/age?output=days"
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+8342
+```
+
+---
+
+### 7.2 Consultar idade em meses
+
+```bash
+curl -X GET "http://localhost:8080/person/1/age?output=months"
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+274
+```
+
+---
+
+### 7.3 Consultar idade em anos
+
+```bash
+curl -X GET "http://localhost:8080/person/1/age?output=years"
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+22
+```
+
+---
+
+### 7.4 Pessoa não encontrada
+
+```bash
+curl -X GET "http://localhost:8080/person/999/age?output=years"
+```
+
+### Resposta esperada — HTTP 404 (Not Found)
+
+```json
+{
+  "timestamp": "2026-04-02T10:00:00",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Pessoa com ID 999 não encontrada"
+}
+```
+
+---
+
+### 7.5 Parâmetro output inválido
+
+```bash
+curl -X GET "http://localhost:8080/person/1/age?output=invalid"
+```
+
+### Resposta esperada — HTTP 400 (Bad Request)
+
+```json
+{
+  "timestamp": "2026-04-02T10:05:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Formato de saída inválido. Use: days, months ou years"
 }
 ```
 

@@ -1,5 +1,6 @@
 package br.com.rafaellbarros.sccon.geospatial.service;
 
+import br.com.rafaellbarros.sccon.geospatial.domain.enums.FormatoIdade;
 import br.com.rafaellbarros.sccon.geospatial.domain.model.Pessoa;
 import br.com.rafaellbarros.sccon.geospatial.exception.PessoaNaoEncontradaException;
 import br.com.rafaellbarros.sccon.geospatial.repository.PessoaInMemoryRepository;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +123,23 @@ public class PessoaService {
         return pessoa;
     }
 
+    public long calcularIdade(Long id, String output) {
+        Pessoa pessoa = repository.buscarPorId(id);
+
+        LocalDate dataNascimento = pessoa.getDataNascimento();
+
+        // TODO: Específicado conforme o requsito data atual 07/02/2023
+        LocalDate hoje = LocalDate.of(2023, 2, 7);
+
+        FormatoIdade formato = FormatoIdade.from(output);
+
+        return switch (formato) {
+            case DAYS -> ChronoUnit.DAYS.between(dataNascimento, hoje);
+            case MONTHS -> ChronoUnit.MONTHS.between(dataNascimento, hoje);
+            case YEARS -> ChronoUnit.YEARS.between(dataNascimento, hoje);
+        };
+    }
+
     private void validarPessoaObrigatoria(Pessoa pessoa) {
         validarTextoObrigatorio(
                 pessoa.getNome(),
@@ -184,9 +203,9 @@ public class PessoaService {
     private List<Pessoa> criarPessoasIniciais() {
         return List.of(
                 new Pessoa(
-                        "João Silva",
-                        LocalDate.of(1990, 5, 15),
-                        LocalDate.of(2015, 3, 10)
+                        "José da Silva",
+                        LocalDate.of(2000, 4, 6),
+                        LocalDate.of(2020, 5, 10)
                 ),
                 new Pessoa(
                         "Maria Oliveira",

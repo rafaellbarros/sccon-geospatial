@@ -33,6 +33,16 @@ public class PessoaController {
         );
     }
 
+    @GetMapping("/{id}/age")
+    public ResponseEntity<Long> calcularIdade(
+            @PathVariable Long id,
+            @RequestParam String output
+    ) {
+        return ResponseEntity.ok(
+                pessoaService.calcularIdade(id, output)
+        );
+    }
+
     @PostMapping
     public ResponseEntity<Pessoa> criarPessoa(
             @RequestBody Pessoa pessoa
