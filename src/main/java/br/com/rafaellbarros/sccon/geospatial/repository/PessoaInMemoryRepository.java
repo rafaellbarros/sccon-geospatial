@@ -5,6 +5,7 @@ import br.com.rafaellbarros.sccon.geospatial.exception.PessoaDuplicadaException;
 import br.com.rafaellbarros.sccon.geospatial.exception.PessoaNaoEncontradaException;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,5 +66,59 @@ public class PessoaInMemoryRepository {
         pessoaMap.put(id, pessoaAtualizada);
 
         return pessoaAtualizada;
+    }
+
+    public Pessoa atualizarParcialPorId(
+            Long id,
+            Map<String, Object> campos
+    ) {
+        Pessoa pessoa = pessoaMap.get(id);
+
+        if (pessoa == null) {
+            throw new PessoaNaoEncontradaException(
+                    String.format(
+                            "Pessoa com ID %d não encontrada",
+                            id
+                    )
+            );
+        }
+
+        if (campos.containsKey("nome")) {
+            String nome = (String) campos.get("nome");
+
+            if (nome == null || nome.trim().isEmpty()) {
+                throw new IllegalArgumentException("Nome é obrigatório");
+            }
+
+            pessoa.setNome(nome);
+        }
+
+        if (campos.containsKey("data_nascimento")) {
+            String data = (String) campos.get("data_nascimento");
+
+            if (data == null) {
+                throw new IllegalArgumentException(
+                        "Data de nascimento é obrigatória"
+                );
+            }
+
+            pessoa.setDataNascimento(LocalDate.parse(data));
+        }
+
+        if (campos.containsKey("data_admissao")) {
+            String data = (String) campos.get("data_admissao");
+
+            if (data == null) {
+                throw new IllegalArgumentException(
+                        "Data de admissão é obrigatória"
+                );
+            }
+
+            pessoa.setDataAdmissao(LocalDate.parse(data));
+        }
+
+        pessoaMap.put(id, pessoa);
+
+        return pessoa;
     }
 }

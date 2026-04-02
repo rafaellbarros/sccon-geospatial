@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
@@ -94,6 +95,22 @@ public class PessoaService {
                 "Pessoa atualizada com sucesso. id={}, nome={}",
                 id,
                 pessoaAtualizada.getNome()
+        );
+
+        return pessoaAtualizada;
+    }
+
+    public Pessoa atualizarPessoaParcial(
+            Long id,
+            Map<String, Object> campos
+    ) {
+        Pessoa pessoaAtualizada =
+                repository.atualizarParcialPorId(id, campos);
+
+        log.info(
+                "Pessoa atualizada parcialmente. id={}, campos={}",
+                id,
+                campos.keySet()
         );
 
         return pessoaAtualizada;

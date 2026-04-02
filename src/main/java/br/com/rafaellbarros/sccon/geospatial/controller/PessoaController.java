@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,6 +50,17 @@ public class PessoaController {
             @RequestBody Pessoa pessoa
     ) {
         Pessoa pessoaAtualizada = pessoaService.atualizarPessoa(id, pessoa);
+
+        return ResponseEntity.ok(pessoaAtualizada);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Pessoa> atualizarPessoaParcial(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> campos
+    ) {
+        Pessoa pessoaAtualizada =
+                pessoaService.atualizarPessoaParcial(id, campos);
 
         return ResponseEntity.ok(pessoaAtualizada);
     }

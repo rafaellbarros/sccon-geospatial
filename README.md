@@ -21,6 +21,10 @@ API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, util
   - Atualiza uma pessoa existente no mapa em memória
   - Caso o ID não exista → retorna HTTP 404 (Not Found)
   - Validação de campos obrigatórios → HTTP 400 (Bad Request)
+- ✅ **Endpoint PATCH /person/{id}**
+  - Atualização parcial de atributos
+  - Caso o ID não exista → HTTP 404
+  - Campos inválidos → HTTP 400
 
 ---
 
@@ -324,6 +328,134 @@ curl -X PUT http://localhost:8080/person/2 \
 ```json
 {
   "timestamp": "2026-04-01T20:05:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Nome é obrigatório"
+}
+```
+
+---
+
+## 5. Atualizar atributo(s) de uma pessoa por ID
+
+```bash
+PATCH /person/{id}
+```
+
+Atualiza parcialmente um ou mais atributos de uma pessoa existente no mapa em memória.
+
+Caso o ID informado não exista, a API retorna **HTTP 404 (Not Found)**.
+
+---
+
+### 5.1 Atualizar apenas o nome
+
+```bash
+curl -X PATCH http://localhost:8080/person/2 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Maria Oliveira Silva"
+  }'
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+{
+  "id": 2,
+  "nome": "Maria Oliveira Silva",
+  "data_nascimento": "1985-08-22",
+  "data_admissao": "2010-07-01"
+}
+```
+
+---
+
+### 5.2 Atualizar apenas a data de admissão
+
+```bash
+curl -X PATCH http://localhost:8080/person/2 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data_admissao": "2012-10-15"
+  }'
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+{
+  "id": 2,
+  "nome": "Maria Oliveira",
+  "data_nascimento": "1985-08-22",
+  "data_admissao": "2012-10-15"
+}
+```
+
+---
+
+### 5.3 Atualizar múltiplos campos
+
+```bash
+curl -X PATCH http://localhost:8080/person/2 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Maria Oliveira Atualizada",
+    "data_admissao": "2013-01-01"
+  }'
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+{
+  "id": 2,
+  "nome": "Maria Oliveira Atualizada",
+  "data_nascimento": "1985-08-22",
+  "data_admissao": "2013-01-01"
+}
+```
+
+---
+
+### 5.4 Tentar atualizar pessoa inexistente
+
+```bash
+curl -X PATCH http://localhost:8080/person/999 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Pessoa Não Existe"
+  }'
+```
+
+### Resposta esperada — HTTP 404 (Not Found)
+
+```json
+{
+  "timestamp": "2026-04-01T20:20:00",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Pessoa com ID 999 não encontrada"
+}
+```
+
+---
+
+### 5.5 Campo inválido
+
+```bash
+curl -X PATCH http://localhost:8080/person/2 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": ""
+  }'
+```
+
+### Resposta esperada — HTTP 400 (Bad Request)
+
+```json
+{
+  "timestamp": "2026-04-01T20:25:00",
   "status": 400,
   "error": "Bad Request",
   "message": "Nome é obrigatório"
