@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,16 @@ public class PessoaController {
     ) {
         return ResponseEntity.ok(
                 pessoaService.calcularIdade(id, output)
+        );
+    }
+
+    @GetMapping("/{id}/salary")
+    public ResponseEntity<BigDecimal> calcularSalario(
+            @PathVariable Long id,
+            @RequestParam String output
+    ) {
+        return ResponseEntity.ok(
+                pessoaService.calcularSalario(id, output)
         );
     }
 

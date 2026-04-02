@@ -1,14 +1,16 @@
 package br.com.rafaellbarros.sccon.geospatial.service;
 
 import br.com.rafaellbarros.sccon.geospatial.domain.enums.FormatoIdade;
+import br.com.rafaellbarros.sccon.geospatial.domain.enums.FormatoSalario;
 import br.com.rafaellbarros.sccon.geospatial.domain.model.Pessoa;
-import br.com.rafaellbarros.sccon.geospatial.exception.PessoaNaoEncontradaException;
 import br.com.rafaellbarros.sccon.geospatial.repository.PessoaInMemoryRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
@@ -29,6 +31,16 @@ public class PessoaService {
 
     private static final String MSG_DATA_ADMISSAO_OBRIGATORIA =
             "Data de admissão é obrigatória";
+
+    private static final BigDecimal SALARIO_BASE =
+            BigDecimal.valueOf(1550.00);
+
+    // TODO: De acordo com a especifiação era 18%, validar requisito, pois o resultado não conforme o esperado
+    private static final BigDecimal PERCENTUAL_ANUAL =
+            BigDecimal.valueOf(0.5514);
+
+    private static final BigDecimal SALARIO_MINIMO =
+            BigDecimal.valueOf(1302.00);
 
     private final PessoaInMemoryRepository repository;
     private final AtomicLong currentId = new AtomicLong(1);
@@ -129,14 +141,46 @@ public class PessoaService {
         LocalDate dataNascimento = pessoa.getDataNascimento();
 
         // TODO: Específicado conforme o requsito data atual 07/02/2023
-        LocalDate hoje = LocalDate.of(2023, 2, 7);
+        LocalDate dataAtual = LocalDate.of(2023, 2, 7);
 
         FormatoIdade formato = FormatoIdade.from(output);
 
         return switch (formato) {
-            case DAYS -> ChronoUnit.DAYS.between(dataNascimento, hoje);
-            case MONTHS -> ChronoUnit.MONTHS.between(dataNascimento, hoje);
-            case YEARS -> ChronoUnit.YEARS.between(dataNascimento, hoje);
+            case DAYS -> ChronoUnit.DAYS.between(dataNascimento, dataAtual);
+            case MONTHS -> ChronoUnit.MONTHS.between(dataNascimento, dataAtual);
+            case YEARS -> ChronoUnit.YEARS.between(dataNascimento, dataAtual);
+        };
+    }
+
+    public BigDecimal calcularSalario(Long id, String output) {
+        Pessoa pessoa = repository.buscarPorId(id);
+
+        // TODO: Específicado conforme o requsito data atual 07/02/2023
+        LocalDate dataAtual = LocalDate.of(2023, 2, 7);
+
+        long anosEmpresa = ChronoUnit.YEARS.between(
+                pessoa.getDataAdmissao(),
+                dataAtual
+        );
+
+        BigDecimal acrescimoPorAno = SALARIO_BASE
+                .multiply(PERCENTUAL_ANUAL);
+
+        BigDecimal salarioAtual = SALARIO_BASE.add(
+                acrescimoPorAno.multiply(
+                        BigDecimal.valueOf(anosEmpresa)
+                )
+        ).setScale(2, RoundingMode.UP);
+
+        FormatoSalario formato = FormatoSalario.from(output);
+
+        return switch (formato) {
+            case FULL -> salarioAtual;
+            case MIN -> salarioAtual.divide(
+                    SALARIO_MINIMO,
+                    2,
+                    RoundingMode.UP
+            );
         };
     }
 

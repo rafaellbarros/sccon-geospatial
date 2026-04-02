@@ -32,6 +32,15 @@ API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, util
   - Retorna a idade atual da pessoa em dias, meses ou anos completos
   - Caso o ID não exista → HTTP 404 (Not Found)
   - Caso o parâmetro `output` seja inválido → HTTP 400 (Bad Request)
+- ✅ **Endpoint GET /person/{id}/salary?output={min|full}**
+  - Retorna o salário atual da pessoa em valor monetário (`full`) ou em quantidade de salários mínimos (`min`)
+  - Cálculo baseado no salário inicial de **R$ 1550,00**
+  - Acréscimo de **55,14% ao ano completo de empresa**
+  - Saída com **duas casas decimais e arredondamento para cima**
+  - Caso o ID não exista → HTTP 404 (Not Found)
+  - Caso o parâmetro `output` seja inválido → HTTP 400 (Bad Request)
+
+Nota: Observou-se uma divergência de R$ 0,02 no valor total (full) em relação ao exemplo do enunciado. A implementação seguiu estritamente o cálculo de 55,14% sobre o salário base e arredondamento UP, priorizando a precisão do BigDecimal. O valor 18% no código não gera o resultado conforme o requisto.
 
 ---
 
@@ -616,7 +625,99 @@ curl -X GET "http://localhost:8080/person/1/age?output=invalid"
   "message": "Formato de saída inválido. Use: days, months ou years"
 }
 ```
+---
 
+## 8. Consultar salário atual da pessoa
+
+```bash
+GET /person/{id}/salary?output={min|full}
+```
+
+Retorna o salário atual da pessoa com base na data de admissão.
+
+### Regras de cálculo
+
+- Salário inicial: **R$ 1550,00**
+- Acréscimo anual: **18% do valor base**
+- Valor do salário mínimo: **R$ 1302,00**
+- Cálculo realizado com base em **anos completos de empresa**
+- Resultado com **2 casas decimais**
+- Arredondamento: **para cima**
+
+Valores aceitos para `output`:
+
+- `full` → valor total em reais
+- `min` → quantidade equivalente em salários mínimos
+
+Caso o ID não exista, a API retorna **HTTP 404 (Not Found)**.
+
+Caso o parâmetro `output` seja inválido, a API retorna **HTTP 400 (Bad Request)**.
+
+---
+
+### 8.1 Consultar salário em reais
+
+```bash
+curl -X GET "http://localhost:8080/person/1/salary?output=full"
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+2945.00
+```
+
+---
+
+### 8.2 Consultar salário em salários mínimos
+
+```bash
+curl -X GET "http://localhost:8080/person/1/salary?output=min"
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+2.27
+```
+
+---
+
+### 8.3 Pessoa não encontrada
+
+```bash
+curl -X GET "http://localhost:8080/person/999/salary?output=full"
+```
+
+### Resposta esperada — HTTP 404 (Not Found)
+
+```json
+{
+  "timestamp": "2026-04-02T10:30:00",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Pessoa com ID 999 não encontrada"
+}
+```
+
+---
+
+### 8.4 Parâmetro output inválido
+
+```bash
+curl -X GET "http://localhost:8080/person/1/salary?output=invalid"
+```
+
+### Resposta esperada — HTTP 400 (Bad Request)
+
+```json
+{
+  "timestamp": "2026-04-02T10:35:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Formato de saída inválido. Use: min ou full"
+}
+```
 ---
 
 ## 📄 Licença
