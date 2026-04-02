@@ -116,6 +116,16 @@ public class PessoaService {
         return pessoaAtualizada;
     }
 
+    public Pessoa buscarPorId(Long id) {
+        Pessoa pessoa = repository.buscarPorId(id);
+
+        log.info("Pessoa encontrada. id={}, nome={}",
+                id,
+                pessoa.getNome());
+
+        return pessoa;
+    }
+
     private void validarCamposObrigatorios(Pessoa pessoa) {
         validarTextoObrigatorio(
                 pessoa.getNome(),

@@ -65,4 +65,13 @@ public class PessoaController {
         return ResponseEntity.ok(pessoaAtualizada);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Pessoa> buscarPorId(
+            @PathVariable Long id
+    ) {
+        Pessoa pessoa = pessoaService.buscarPorId(id);
+
+        return ResponseEntity.ok(pessoa);
+    }
+
 }

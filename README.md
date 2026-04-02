@@ -25,6 +25,9 @@ API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, util
   - Atualização parcial de atributos
   - Caso o ID não exista → HTTP 404
   - Campos inválidos → HTTP 400
+- ✅ **Endpoint GET /person/{id}**
+  - Busca uma pessoa específica por ID
+  - Caso o ID não exista → HTTP 404 (Not Found)
 
 ---
 
@@ -459,6 +462,55 @@ curl -X PATCH http://localhost:8080/person/2 \
   "status": 400,
   "error": "Bad Request",
   "message": "Nome é obrigatório"
+}
+```
+---
+
+## 6 Buscar pessoa por ID
+
+```bash
+GET /person/{id}
+```
+
+Retorna uma pessoa específica com base no ID informado.
+
+Caso o ID não exista, a API retorna **HTTP 404 (Not Found)**.
+
+---
+
+### 6.1 Buscar pessoa existente
+
+```bash
+curl -X GET http://localhost:8080/person/1
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+{
+  "id": 1,
+  "nome": "João Silva",
+  "dataNascimento": "1990-05-15",
+  "dataAdmissao": "2015-03-10"
+}
+```
+
+---
+
+### 6.2 Buscar pessoa inexistente
+
+```bash
+curl -X GET http://localhost:8080/person/999
+```
+
+### Resposta esperada — HTTP 404 (Not Found)
+
+```json
+{
+  "timestamp": "2026-04-02T09:00:00",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Pessoa com ID 999 não encontrada"
 }
 ```
 

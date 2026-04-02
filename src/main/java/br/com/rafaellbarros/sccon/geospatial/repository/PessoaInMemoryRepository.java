@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -120,5 +121,17 @@ public class PessoaInMemoryRepository {
         pessoaMap.put(id, pessoa);
 
         return pessoa;
+    }
+
+    public Pessoa buscarPorId(Long id) {
+        return Optional.ofNullable(pessoaMap.get(id))
+                .orElseThrow(() ->
+                        new PessoaNaoEncontradaException(
+                                String.format(
+                                        "Pessoa com ID %d não encontrada",
+                                        id
+                                )
+                        )
+                );
     }
 }
