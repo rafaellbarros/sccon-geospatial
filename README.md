@@ -50,7 +50,7 @@ Nota: Observou-se uma divergência de R$ 0,02 no valor total (full) em relação
 
 ## 🛠️ Tecnologias Utilizadas
 
-- Java 17+
+- Java 21+
 - Spring Boot 3.5.13
 - Spring Web
 - Maven
@@ -59,7 +59,7 @@ Nota: Observou-se uma divergência de R$ 0,02 no valor total (full) em relação
 
 ## 🔧 Pré-requisitos
 
-- JDK 17 ou superior
+- JDK 21 ou superior
 - Maven 3.6+
 - Git (opcional)
 
