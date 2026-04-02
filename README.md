@@ -750,7 +750,7 @@ curl -X GET "http://localhost:8080/person/1/salary?output=full"
 ### Resposta esperada — HTTP 200 (OK)
 
 ```json
-2945.00
+3259.34
 ```
 
 ---
@@ -764,7 +764,7 @@ curl -X GET "http://localhost:8080/person/1/salary?output=min"
 ### Resposta esperada — HTTP 200 (OK)
 
 ```json
-2.27
+2.51
 ```
 
 ---
