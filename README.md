@@ -1,5 +1,9 @@
 # SCCON Geospatial - API de Pessoas
 
+![Version](https://img.shields.io/badge/version-v1.0-blue)
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.13-brightgreen)
+
 ## 📋 Sobre o Projeto
 
 API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, utilizando armazenamento em memória (`ConcurrentHashMap`) para alta performance nas operações de busca por ID.
