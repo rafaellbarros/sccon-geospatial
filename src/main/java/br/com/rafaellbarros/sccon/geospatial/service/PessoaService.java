@@ -143,7 +143,7 @@ public class PessoaService {
         // TODO: Específicado conforme o requsito data atual 07/02/2023
         LocalDate dataAtual = LocalDate.of(2023, 2, 7);
 
-        FormatoIdade formato = FormatoIdade.from(output);
+        FormatoIdade formato = FormatoIdade.from(output.trim());
 
         return switch (formato) {
             case DAYS -> ChronoUnit.DAYS.between(dataNascimento, dataAtual);
@@ -172,7 +172,7 @@ public class PessoaService {
                 )
         ).setScale(2, RoundingMode.UP);
 
-        FormatoSalario formato = FormatoSalario.from(output);
+        FormatoSalario formato = FormatoSalario.from(output.trim());
 
         return switch (formato) {
             case FULL -> salarioAtual;

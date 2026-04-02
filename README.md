@@ -72,18 +72,100 @@ cd sccon-geospatial
 
 ### 2. Execute a aplicação
 
-#### Opção 1: Usando Maven
+#### Opção 1: 🐳 Executando com Docker
+
+```bash
+mvn clean package
+docker compose up --build
+```
+
+API disponível em:
+
+```bash
+http://localhost:8080/person
+```
+
+## 📬 Collection para Postman / Insomnia
+
+O projeto disponibiliza uma collection pronta para facilitar a execução e validação dos endpoints da API.
+
+Arquivo disponível na raiz do projeto:
+
+```bash
+sccon-geospatial-api-collection.json
+```
+
+Esta collection pode ser importada tanto no **Postman** quanto no **Insomnia**.
+
+Ela contém exemplos prontos para todos os endpoints implementados:
+
+- `GET /person`
+- `GET /person/{id}`
+- `POST /person`
+- `PUT /person/{id}`
+- `PATCH /person/{id}`
+- `DELETE /person/{id}`
+- `GET /person/{id}/age?output={days|months|years}`
+- `GET /person/{id}/salary?output={min|full}`
+
+---
+
+### 📥 Como importar no Postman
+
+1. Abra o **Postman**
+2. Clique em **Import**
+3. Selecione o arquivo:
+
+```bash
+sccon-geospatial-api-collection.json
+```
+
+4. Clique em **Import**
+
+A collection ficará disponível na área lateral para execução dos testes.
+
+---
+
+### 📥 Como importar no Insomnia
+
+1. Abra o **Insomnia**
+2. Clique em **Create**
+3. Selecione **Import/Export**
+4. Escolha **Import Data**
+5. Selecione o arquivo:
+
+```bash
+sccon-geospatial-api-collection.json
+```
+
+6. Confirme a importação
+
+---
+
+### 🚀 Execução rápida dos testes
+
+Após subir a aplicação localmente ou via Docker:
+
+```bash
+http://localhost:8080/person
+```
+
+Basta executar as requisições diretamente pela collection importada.
+
+---
+
+#### Opção 2: Usando Maven
 
 ```bash
 mvn clean install
 mvn spring-boot:run
 ```
 
-#### Opção 2: Gerando JAR e executando
+#### Opção 3: Gerando JAR e executando
 
 ```bash
 mvn clean package
-java -jar target/sccon-geospatial-0.0.1-SNAPSHOT.jar
+java -jar target/sccon-geospatial-1.0.jar
 ```
 
 ---

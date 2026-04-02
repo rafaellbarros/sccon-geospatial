@@ -1,0 +1,175 @@
+{
+  "info": {
+    "name": "SCCON Geospatial API",
+    "_postman_id": "sccon-geospatial-api",
+    "description": "Collection para testes da API de Pessoas",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Listar Pessoas",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/person",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["person"]
+        }
+      }
+    },
+    {
+      "name": "Buscar Pessoa por ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/person/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["person", "1"]
+        }
+      }
+    },
+    {
+      "name": "Criar Pessoa",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Mariana Costa\",\n  \"data_nascimento\": \"1993-09-18\",\n  \"data_admissao\": \"2019-04-22\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/person",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["person"]
+        }
+      }
+    },
+    {
+      "name": "Atualizar Pessoa",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Pessoa Atualizada\",\n  \"data_nascimento\": \"1990-01-01\",\n  \"data_admissao\": \"2020-01-01\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/person/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["person", "1"]
+        }
+      }
+    },
+    {
+      "name": "Atualização Parcial",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Nome Parcial\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/person/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["person", "1"]
+        }
+      }
+    },
+    {
+      "name": "Remover Pessoa",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "http://localhost:8080/person/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["person", "1"]
+        }
+      }
+    },
+    {
+      "name": "Calcular Idade em Anos",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/person/1/age?output=years",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["person", "1", "age"],
+          "query": [
+            {
+              "key": "output",
+              "value": "years"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Calcular Salário Full",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/person/1/salary?output=full",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["person", "1", "salary"],
+          "query": [
+            {
+              "key": "output",
+              "value": "full"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Calcular Salário Min",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/person/1/salary?output=min",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["person", "1", "salary"],
+          "query": [
+            {
+              "key": "output",
+              "value": "min"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
