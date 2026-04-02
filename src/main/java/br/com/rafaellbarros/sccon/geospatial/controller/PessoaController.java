@@ -6,6 +6,7 @@ import br.com.rafaellbarros.sccon.geospatial.service.PessoaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -19,20 +20,54 @@ public class PessoaController {
     private final PessoaService pessoaService;
 
     @GetMapping
-    public ResponseEntity<List<Pessoa>> listarTodas() {
+    public ResponseEntity<List<Pessoa>> listarPessoas() {
         return ResponseEntity.ok(pessoaService.buscarTodas());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Pessoa> buscarPorId(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(
+                pessoaService.buscarPorId(id)
+        );
+    }
+
     @PostMapping
-    public ResponseEntity<Pessoa> criarPessoa(@RequestBody Pessoa pessoa
+    public ResponseEntity<Pessoa> criarPessoa(
+            @RequestBody Pessoa pessoa
     ) {
         Pessoa novaPessoa = pessoaService.criarPessoa(pessoa);
 
-        URI location = URI.create("/pessoas/" + novaPessoa.getId());
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(novaPessoa.getId())
+                .toUri();
 
         return ResponseEntity
                 .created(location)
                 .body(novaPessoa);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Pessoa> atualizarPessoa(
+            @PathVariable Long id,
+            @RequestBody Pessoa pessoa
+    ) {
+        return ResponseEntity.ok(
+                pessoaService.atualizarPessoa(id, pessoa)
+        );
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Pessoa> atualizarPessoaParcial(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> campos
+    ) {
+        return ResponseEntity.ok(
+                pessoaService.atualizarPessoaParcial(id, campos)
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -43,35 +78,4 @@ public class PessoaController {
 
         return ResponseEntity.noContent().build();
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Pessoa> atualizarPessoa(
-            @PathVariable Long id,
-            @RequestBody Pessoa pessoa
-    ) {
-        Pessoa pessoaAtualizada = pessoaService.atualizarPessoa(id, pessoa);
-
-        return ResponseEntity.ok(pessoaAtualizada);
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<Pessoa> atualizarPessoaParcial(
-            @PathVariable Long id,
-            @RequestBody Map<String, Object> campos
-    ) {
-        Pessoa pessoaAtualizada =
-                pessoaService.atualizarPessoaParcial(id, campos);
-
-        return ResponseEntity.ok(pessoaAtualizada);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Pessoa> buscarPorId(
-            @PathVariable Long id
-    ) {
-        Pessoa pessoa = pessoaService.buscarPorId(id);
-
-        return ResponseEntity.ok(pessoa);
-    }
-
 }

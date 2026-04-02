@@ -1,6 +1,7 @@
 package br.com.rafaellbarros.sccon.geospatial.service;
 
 import br.com.rafaellbarros.sccon.geospatial.domain.model.Pessoa;
+import br.com.rafaellbarros.sccon.geospatial.exception.PessoaNaoEncontradaException;
 import br.com.rafaellbarros.sccon.geospatial.repository.PessoaInMemoryRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +19,170 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequiredArgsConstructor
 public class PessoaService {
 
+    private static final String MSG_NOME_OBRIGATORIO =
+            "Nome é obrigatório";
+
+    private static final String MSG_DATA_NASCIMENTO_OBRIGATORIA =
+            "Data de nascimento é obrigatória";
+
+    private static final String MSG_DATA_ADMISSAO_OBRIGATORIA =
+            "Data de admissão é obrigatória";
+
     private final PessoaInMemoryRepository repository;
     private final AtomicLong currentId = new AtomicLong(1);
 
     @PostConstruct
     public void init() {
-        inicializarPessoas();
+        carregarBaseInicial();
     }
 
-    private void inicializarPessoas() {
-        List<Pessoa> pessoasIniciais = List.of(
+    public List<Pessoa> buscarTodas() {
+        log.info("Buscando todas as pessoas");
+
+        return repository.buscarTodas()
+                .stream()
+                .sorted(
+                        Comparator.comparing(
+                                Pessoa::getNome,
+                                String.CASE_INSENSITIVE_ORDER
+                        )
+                )
+                .toList();
+    }
+
+    public Pessoa criarPessoa(Pessoa pessoa) {
+        validarPessoaObrigatoria(pessoa);
+
+        Long id = gerarOuObterId(pessoa.getId());
+        pessoa.setId(id);
+
+        Pessoa pessoaSalva = repository.criar(id, pessoa);
+
+        log.info(
+                "Pessoa criada com sucesso. id={}, nome={}",
+                id,
+                pessoaSalva.getNome()
+        );
+
+        return pessoaSalva;
+    }
+
+    public Pessoa atualizarPessoa(Long id, Pessoa pessoa) {
+        validarPessoaObrigatoria(pessoa);
+
+        Pessoa pessoaAtualizada = repository.atualizar(id, pessoa);
+
+        log.info(
+                "Pessoa atualizada com sucesso. id={}, nome={}",
+                id,
+                pessoaAtualizada.getNome()
+        );
+
+        return pessoaAtualizada;
+    }
+
+    public Pessoa atualizarPessoaParcial(
+            Long id,
+            Map<String, Object> campos
+    ) {
+        Pessoa pessoa = repository.buscarPorId(id);
+
+        atualizarNomeSeInformado(campos, pessoa);
+        atualizarDataNascimentoSeInformada(campos, pessoa);
+        atualizarDataAdmissaoSeInformada(campos, pessoa);
+
+        Pessoa pessoaAtualizada =
+                repository.atualizar(id, pessoa);
+
+        log.info(
+                "Pessoa atualizada parcialmente. id={}, campos={}",
+                id,
+                campos.keySet()
+        );
+
+        return pessoaAtualizada;
+    }
+
+    public void removerPessoa(Long id) {
+        repository.remover(id);
+
+        log.info("Pessoa removida com sucesso. id={}", id);
+    }
+
+    public Pessoa buscarPorId(Long id) {
+        Pessoa pessoa = repository.buscarPorId(id);
+
+        log.info(
+                "Pessoa encontrada. id={}, nome={}",
+                id,
+                pessoa.getNome()
+        );
+
+        return pessoa;
+    }
+
+    private void validarPessoaObrigatoria(Pessoa pessoa) {
+        validarTextoObrigatorio(
+                pessoa.getNome(),
+                MSG_NOME_OBRIGATORIO
+        );
+
+        validarNaoNulo(
+                pessoa.getDataNascimento(),
+                MSG_DATA_NASCIMENTO_OBRIGATORIA
+        );
+
+        validarNaoNulo(
+                pessoa.getDataAdmissao(),
+                MSG_DATA_ADMISSAO_OBRIGATORIA
+        );
+    }
+
+    private void validarTextoObrigatorio(
+            String valor,
+            String mensagem
+    ) {
+        if (valor == null || valor.trim().isBlank()) {
+            throw new IllegalArgumentException(mensagem);
+        }
+    }
+
+    private void validarNaoNulo(
+            Object valor,
+            String mensagem
+    ) {
+        if (valor == null) {
+            throw new IllegalArgumentException(mensagem);
+        }
+    }
+
+    private Long gerarOuObterId(Long idExistente) {
+        Long id = idExistente != null
+                ? idExistente
+                : currentId.getAndIncrement();
+
+        atualizarSequenciaId(id);
+
+        return id;
+    }
+
+    private void atualizarSequenciaId(Long id) {
+        currentId.updateAndGet(
+                current -> Math.max(current, id + 1)
+        );
+    }
+
+    private void carregarBaseInicial() {
+        criarPessoasIniciais().forEach(this::criarPessoa);
+
+        log.info(
+                "Base inicializada com {} pessoas",
+                buscarTodas().size()
+        );
+    }
+
+    private List<Pessoa> criarPessoasIniciais() {
+        return List.of(
                 new Pessoa(
                         "João Silva",
                         LocalDate.of(1990, 5, 15),
@@ -44,128 +199,49 @@ public class PessoaService {
                         LocalDate.of(2018, 1, 15)
                 )
         );
-
-        pessoasIniciais.forEach(this::criarPessoa);
-
-        log.info("Base inicializada com {} pessoas", buscarTodas().size());
     }
 
-    public List<Pessoa> buscarTodas() {
-        log.info("Buscando todas as pessoas");
-
-        return repository.buscarTodas()
-                .stream()
-                .sorted(Comparator.comparing(
-                        Pessoa::getNome,
-                        String.CASE_INSENSITIVE_ORDER
-                ))
-                .toList();
-    }
-
-    public Pessoa criarPessoa(Pessoa pessoa) {
-        validarCamposObrigatorios(pessoa);
-
-        Long id = obterOuGerarId(pessoa);
-
-        atualizarSequenciaIdSeNecessario(id);
-
-        Pessoa pessoaSalva = repository.salvarSeAusente(id, pessoa);
-
-        log.info(
-                "Pessoa criada com sucesso. id={}, nome={}",
-                pessoaSalva.getId(),
-                pessoaSalva.getNome()
-        );
-
-        return pessoaSalva;
-    }
-
-    public void removerPessoa(Long id) {
-        repository.removerPorId(id);
-
-        log.info("Pessoa removida com sucesso. id={}", id);
-    }
-
-    public Pessoa atualizarPessoa(Long id, Pessoa pessoa) {
-        validarCamposObrigatorios(pessoa);
-
-        Pessoa pessoaAtualizada = repository.atualizarPorId(id, pessoa);
-
-        log.info(
-                "Pessoa atualizada com sucesso. id={}, nome={}",
-                id,
-                pessoaAtualizada.getNome()
-        );
-
-        return pessoaAtualizada;
-    }
-
-    public Pessoa atualizarPessoaParcial(
-            Long id,
-            Map<String, Object> campos
+    private void atualizarNomeSeInformado(
+            Map<String, Object> campos,
+            Pessoa pessoa
     ) {
-        Pessoa pessoaAtualizada =
-                repository.atualizarParcialPorId(id, campos);
+        if (!campos.containsKey("nome")) {
+            return;
+        }
 
-        log.info(
-                "Pessoa atualizada parcialmente. id={}, campos={}",
-                id,
-                campos.keySet()
-        );
+        String nome = (String) campos.get("nome");
 
-        return pessoaAtualizada;
-    }
-
-    public Pessoa buscarPorId(Long id) {
-        Pessoa pessoa = repository.buscarPorId(id);
-
-        log.info("Pessoa encontrada. id={}, nome={}",
-                id,
-                pessoa.getNome());
-
-        return pessoa;
-    }
-
-    private void validarCamposObrigatorios(Pessoa pessoa) {
         validarTextoObrigatorio(
-                pessoa.getNome(),
-                "Nome é obrigatório"
+                nome,
+                MSG_NOME_OBRIGATORIO
         );
 
-        validarCampoNulo(
-                pessoa.getDataNascimento(),
-                "Data de nascimento é obrigatória"
-        );
-
-        validarCampoNulo(
-                pessoa.getDataAdmissao(),
-                "Data de admissão é obrigatória"
-        );
+        pessoa.setNome(nome);
     }
 
-    private void validarTextoObrigatorio(String valor, String mensagem) {
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException(mensagem);
+    private void atualizarDataNascimentoSeInformada(
+            Map<String, Object> campos,
+            Pessoa pessoa
+    ) {
+        if (campos.containsKey("data_nascimento")) {
+            pessoa.setDataNascimento(
+                    LocalDate.parse(
+                            campos.get("data_nascimento").toString()
+                    )
+            );
         }
     }
 
-    private void validarCampoNulo(Object valor, String mensagem) {
-        if (valor == null) {
-            throw new IllegalArgumentException(mensagem);
+    private void atualizarDataAdmissaoSeInformada(
+            Map<String, Object> campos,
+            Pessoa pessoa
+    ) {
+        if (campos.containsKey("data_admissao")) {
+            pessoa.setDataAdmissao(
+                    LocalDate.parse(
+                            campos.get("data_admissao").toString()
+                    )
+            );
         }
-    }
-
-    private Long obterOuGerarId(Pessoa pessoa) {
-        if (pessoa.getId() == null) {
-            Long novoId = currentId.getAndIncrement();
-            pessoa.setId(novoId);
-            return novoId;
-        }
-
-        return pessoa.getId();
-    }
-
-    private void atualizarSequenciaIdSeNecessario(Long id) {
-        currentId.updateAndGet(current -> Math.max(current, id + 1));
     }
 }
