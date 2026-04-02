@@ -85,6 +85,20 @@ public class PessoaService {
         log.info("Pessoa removida com sucesso. id={}", id);
     }
 
+    public Pessoa atualizarPessoa(Long id, Pessoa pessoa) {
+        validarCamposObrigatorios(pessoa);
+
+        Pessoa pessoaAtualizada = repository.atualizarPorId(id, pessoa);
+
+        log.info(
+                "Pessoa atualizada com sucesso. id={}, nome={}",
+                id,
+                pessoaAtualizada.getNome()
+        );
+
+        return pessoaAtualizada;
+    }
+
     private void validarCamposObrigatorios(Pessoa pessoa) {
         validarTextoObrigatorio(
                 pessoa.getNome(),

@@ -48,4 +48,22 @@ public class PessoaInMemoryRepository {
             );
         }
     }
+
+    public Pessoa atualizarPorId(Long id, Pessoa pessoaAtualizada) {
+        Pessoa pessoaExistente = pessoaMap.get(id);
+
+        if (pessoaExistente == null) {
+            throw new PessoaNaoEncontradaException(
+                    String.format(
+                            "Pessoa com ID %d não encontrada",
+                            id
+                    )
+            );
+        }
+
+        pessoaAtualizada.setId(id);
+        pessoaMap.put(id, pessoaAtualizada);
+
+        return pessoaAtualizada;
+    }
 }

@@ -17,6 +17,10 @@ API REST desenvolvida com Spring Boot 3.5.13 para gerenciamento de pessoas, util
 - ✅ **Endpoint DELETE /person/{id}**
   - Remove uma pessoa do mapa em memória
   - Caso o ID não exista → retorna HTTP 404 (Not Found)
+- ✅ **Endpoint PUT /person/{id}**
+  - Atualiza uma pessoa existente no mapa em memória
+  - Caso o ID não exista → retorna HTTP 404 (Not Found)
+  - Validação de campos obrigatórios → HTTP 400 (Bad Request)
 
 ---
 
@@ -105,8 +109,8 @@ curl -X POST http://localhost:8080/person \
   -H "Content-Type: application/json" \
   -d '{
     "nome": "Mariana Costa",
-    "dataNascimento": "1993-09-18",
-    "dataAdmissao": "2019-04-22"
+    "data_nascimento": "1993-09-18",
+    "data_admissao": "2019-04-22"
   }'
 ```
 
@@ -116,8 +120,8 @@ curl -X POST http://localhost:8080/person \
 {
   "id": 4,
   "nome": "Mariana Costa",
-  "dataNascimento": "1993-09-18",
-  "dataAdmissao": "2019-04-22"
+  "data_nascimento": "1993-09-18",
+  "data_admissao": "2019-04-22"
 }
 ```
 
@@ -131,8 +135,8 @@ curl -X POST http://localhost:8080/person \
   -d '{
     "id": 10,
     "nome": "Fernanda Souza",
-    "dataNascimento": "1991-07-30",
-    "dataAdmissao": "2017-11-15"
+    "data_nascimento": "1991-07-30",
+    "data_admissao": "2017-11-15"
   }'
 ```
 
@@ -142,8 +146,8 @@ curl -X POST http://localhost:8080/person \
 {
   "id": 10,
   "nome": "Fernanda Souza",
-  "dataNascimento": "1991-07-30",
-  "dataAdmissao": "2017-11-15"
+  "data_nascimento": "1991-07-30",
+  "data_admissao": "2017-11-15"
 }
 ```
 
@@ -157,8 +161,8 @@ curl -X POST http://localhost:8080/person \
   -d '{
     "id": 1,
     "nome": "Conflito Teste",
-    "dataNascimento": "1990-01-01",
-    "dataAdmissao": "2020-01-01"
+    "data_nascimento": "1990-01-01",
+    "data_admissao": "2020-01-01"
   }'
 ```
 
@@ -182,8 +186,8 @@ curl -X POST http://localhost:8080/person \
   -H "Content-Type: application/json" \
   -d '{
     "nome": "",
-    "dataNascimento": null,
-    "dataAdmissao": null
+    "data_nascimento": null,
+    "data_admissao": null
   }'
 ```
 
@@ -241,6 +245,93 @@ curl -X DELETE http://localhost:8080/person/999
 
 ---
 
+## 4. Atualizar pessoa por ID
+
+```bash
+PUT /person/{id}
+```
+
+Atualiza completamente os dados de uma pessoa existente no mapa em memória.
+
+Caso o ID informado não exista, a API retorna **HTTP 404 (Not Found)**.
+
+---
+
+### 4.1 Atualizar pessoa existente
+
+```bash
+curl -X PUT http://localhost:8080/person/2 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Maria Oliveira Atualizada",
+    "data_nascimento": "1985-08-22",
+    "data_admissao": "2010-07-01"
+  }'
+```
+
+### Resposta esperada — HTTP 200 (OK)
+
+```json
+{
+  "id": 2,
+  "nome": "Maria Oliveira Atualizada",
+  "data_nascimento": "1985-08-22",
+  "data_admissao": "2010-07-01"
+}
+```
+
+---
+
+### 4.2 Tentar atualizar pessoa inexistente
+
+```bash
+curl -X PUT http://localhost:8080/person/999 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Pessoa Inexistente",
+    "data_nascimento": "1990-01-01",
+    "data_admissao": "2020-01-01"
+  }'
+```
+
+### Resposta esperada — HTTP 404 (Not Found)
+
+```json
+{
+  "timestamp": "2026-04-01T20:00:00",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Pessoa com ID 999 não encontrada"
+}
+```
+
+---
+
+### 4.3 Tentar atualizar com campos inválidos
+
+```bash
+curl -X PUT http://localhost:8080/person/2 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "",
+    "data_nascimento": null,
+    "data_admissao": null
+  }'
+```
+
+### Resposta esperada — HTTP 400 (Bad Request)
+
+```json
+{
+  "timestamp": "2026-04-01T20:05:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Nome é obrigatório"
+}
+```
+
+---
+
 ## 📄 Licença
 
 Este projeto está sob a licença MIT.
@@ -251,6 +342,6 @@ Veja o arquivo `LICENSE` para mais detalhes.
 
 ## 📞 Contato
 
-**Desenvolvedor:** Rafael Barros  
-**Email:** rafaelbarros.df@gmail.com  
+**Desenvolvedor:** Rafael Barros
+**Email:** rafaelbarros.df@gmail.com
 **Projeto:** [sccon-geospatial](https://github.com/rafaellbarros/sccon-geospatial)
